@@ -1,9 +1,9 @@
 from math import log2
 
-size = 38  # Interior dimension. Must be at least 11
+size = 20  # Interior dimension. Must be at least 11
 x_start, z_start = (10, 10)  # Northwest corner of the walls relative to command execution
 max_blocks = 2**15  # The maximum mc allows to process in one command
-helix = 4  # Number of stair helices to create
+helix = 2  # Number of stair helices to create
 
 stair_size = size - 6
 x_corners = (x_start + 1, -(x_start + size))  # Interior corners
