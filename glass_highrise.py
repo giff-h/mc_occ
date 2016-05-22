@@ -1,9 +1,8 @@
 from math import log2
 
-size = 20  # Interior dimension. Must be at least 11
+size = 58  # Interior dimension. Must be at least 11
 x_start, z_start = (10, 10)  # Northwest corner of the walls relative to command execution
 max_blocks = 2**15  # The maximum mc allows to process in one command
-helix = 2  # Number of stair helices to create
 
 stair_size = size - 6
 x_corners = (x_start + 1, -(x_start + size))  # Interior corners
@@ -36,9 +35,6 @@ def clear():
 
 
 def stairs():
-    if helix == 0:
-        return []
-
     stair = floor_fill + " spruce_stairs {}"
     corners = [(x_corners[0], z_corners[0]),
                (x_corners[1], z_corners[1]),
@@ -46,21 +42,20 @@ def stairs():
                (x_corners[0], z_corners[1])]
 
     for i in range(4):
-        if helix > i:
-            lt2 = i < 2
-            x, z = corners[i]
-            x += 3 if lt2 else 1
-            z += 1 if lt2 else 3
-            yield stair.format(abs(x), abs(z), abs(x + int(not lt2)), abs(z + int(lt2)), i)
+        lt2 = i < 2
+        x, z = corners[i]
+        x += 3 if lt2 else 1
+        z += 1 if lt2 else 3
+        yield stair.format(abs(x), abs(z), abs(x + int(not lt2)), abs(z + int(lt2)), i)
 
-            clone = "/clone ~{} 1 ~{}".format(abs(x), abs(z)) + " ~{} {} ~{} ~{} {} ~{} masked"
-            for clone_set in clone_gen(x, z, lt2):
-                yield clone.format(*clone_set)
+        clone = "/clone ~{} 1 ~{}".format(abs(x), abs(z)) + " ~{} {} ~{} ~{} {} ~{} masked"
+        for clone_set in clone_gen(x, z, lt2):
+            yield clone.format(*clone_set)
 
-            x_plank = -(x + (stair_size + 1) ** int(lt2))
-            z_plank = -(z + (stair_size + 1) ** int(not lt2))
-            yield "/fill ~{} {} ~{} ~{} {} ~{} planks 1".format(abs(x_plank), stair_size, abs(z_plank),
-                                                                abs(x_plank + 1), stair_size, abs(z_plank + 1))
+        x_plank = -(x + (stair_size + 1) ** int(lt2))
+        z_plank = -(z + (stair_size + 1) ** int(not lt2))
+        yield "/fill ~{} {} ~{} ~{} {} ~{} planks 1".format(abs(x_plank), stair_size, abs(z_plank),
+                                                            abs(x_plank + 1), stair_size, abs(z_plank + 1))
 
     clone_stairs = "/clone ~{} {} ~{} ~{} {} ~{} ~{} {} ~{}".format(x_start + 2, "{}", z_start + 2,
                                                                     x_start + size - 1, "{}", z_start + size - 1,
@@ -99,7 +94,7 @@ def clone_gen(x, z, lt2):
         x_to = min(abs(x + clone_set[1] * x_mod), abs(x + clone_set[2] ** x_mod))
         z_to = min(abs(z + clone_set[1] * z_mod), abs(z + clone_set[2] ** z_mod))
         yield(x_end, clone_set[1] if clone_set[3] else remaining, z_end,
-              x_to, 1 + clone_set[1] if clone_set[3] else clone_set[2], z_to)
+              x_to, 1 + (clone_set[1] if clone_set[3] else clone_set[2]), z_to)
 
 
 commands = list(walls()) + list(clear()) + list(stairs())
