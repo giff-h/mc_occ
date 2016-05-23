@@ -1,8 +1,10 @@
 from math import log2
 
-size = 58  # Interior dimension. Must be at least 11
+size = 38  # Interior dimension. Must be at least 11
 x_start, z_start = (10, 10)  # Northwest corner of the walls relative to command execution
 max_blocks = 2**15  # The maximum mc allows to process in one command
+absolute = False
+one_command = True
 
 stair_size = size - 6
 x_corners = (x_start + 1, -(x_start + size))  # Interior corners
@@ -99,5 +101,7 @@ def clone_gen(x, z, lt2):
 
 commands = list(walls()) + list(clear()) + list(stairs())
 for line in commands:
-    print("INIT:" + line)
+    if absolute:
+        line = line.replace("~", "")
+    print("INIT:" + line if one_command else line)
 print(len(commands))
